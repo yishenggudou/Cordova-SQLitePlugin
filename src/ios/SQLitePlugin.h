@@ -52,6 +52,10 @@ typedef int WebSQLError;
 
 -(id) getDBPath:(id)dbFile;
 
+- (NSString *) getDBPathCopy;
+
+- (void) copyDatabaseIfNeeded;
+
 +(NSDictionary *)captureSQLiteErrorFromDb:(sqlite3 *)db;
 
 +(int)mapSQLiteErrorCode:(int)code;

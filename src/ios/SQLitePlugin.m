@@ -135,6 +135,39 @@ static int base64_encode_blockend(char* code_out,
 @synthesize openDBs;
 @synthesize appDocsPath;
 
+- (void) copyDatabaseIfNeeded {
+
+    //Using NSFileManager we can perform many file system operations.
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+
+    NSString *dbPath = [self getDBPathCopy];
+    BOOL success = [fileManager fileExistsAtPath:dbPath];
+
+    if(!success) {
+
+       NSString *defaultDBPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"app.db"];
+       success = [fileManager copyItemAtPath:defaultDBPath toPath:dbPath error:&error];
+
+       if (!success)
+          NSAssert1(0, @"Failed to create writable database file with message '%@'.", [error localizedDescription]);
+    }
+}
+
+- (NSString *) getDBPathCopy
+{   
+    //Search for standard documents using NSSearchPathForDirectoriesInDomains
+    //First Param = Searching the documents directory
+    //Second Param = Searching the Users directory and not the System
+    //Expand any tildes and identify home directories.
+
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory , NSUserDomainMask, YES);
+    NSString *documentsDir = [paths objectAtIndex:0];
+    //NSLog(@"dbpath : %@",documentsDir);
+    return [documentsDir stringByAppendingPathComponent:@"app.db"];
+}
+
+
 -(CDVPlugin*) initWithWebView:(UIWebView*)theWebView
 {
     self = (SQLitePlugin*)[super initWithWebView:theWebView];
@@ -147,6 +180,7 @@ static int base64_encode_blockend(char* code_out,
         NSString *docs = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex: 0];
         NSLog(@"Detected docs path: %@", docs);
         [self setAppDocsPath:docs];
+        [self copyDatabaseIfNeeded];
     }
     return self;
 }

@@ -1,3 +1,9 @@
+# Add
+
+添加了默认复制数据库的功能,使用默认的数据库,而不是在线动态获取数据
+
+
+
 # Cordova/PhoneGap SQLitePlugin
 
 Native interface to sqlite in a Cordova/PhoneGap plugin for Android & iOS, working to follow the HTML5 Web SQL API as close as possible.

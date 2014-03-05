@@ -16,8 +16,14 @@ import java.lang.Number;
 
 import java.util.HashMap;
 
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CallbackContext;
+import java.io.*;
+
+import android.app.Activity;
+//import android.content.Context
+
+//import org.apache.cordova.CordovaPlugin;
+//import org.apache.cordova.CallbackContext;
+import org.apache.cordova.*;
 
 import android.database.Cursor;
 
@@ -26,7 +32,7 @@ import android.database.sqlite.*;
 import android.util.Base64;
 import android.util.Log;
 
-public class SQLitePlugin extends CordovaPlugin
+public class SQLitePlugin  extends CordovaPlugin
 {
 	/**
 	 * Multiple database map (static).
@@ -178,6 +184,27 @@ public class SQLitePlugin extends CordovaPlugin
 		}
 	}
 
+    void copy(String file, String folder) throws IOException {
+        File CheckDirectory;
+        CheckDirectory = new File(folder);
+        if (!CheckDirectory.exists())
+        { 
+            CheckDirectory.mkdir();
+        }
+ 
+        //InputStream in = getApplicationContext().getAssets().open(file);
+        InputStream in = cordova.getActivity().getApplicationContext().getAssets().open(file);
+        OutputStream out = new FileOutputStream(folder+file);
+ 
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len; while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+        in.close(); out.close();
+    
+    }
+
+
+
 	// --------------------------------------------------------------------------
 	// LOCAL METHODS
 	// --------------------------------------------------------------------------
@@ -194,6 +221,20 @@ public class SQLitePlugin extends CordovaPlugin
 	 */
 	private void openDatabase(String dbname, String password)
 	{
+
+        try
+        {
+            String pName = this.getClass().getPackage().getName();
+            this.copy("app.db","/data/data/"+pName+"/databases/");
+            //this.copy("0000000000000001.db","/data/data/"+pName+"/databases/file__0/");
+		    Log.v("info", "Copy DataBase: " + "/data/data/"+pName+"/databases/" + "app.db");
+
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
 		if (this.getDatabase(dbname) != null) this.closeDatabase(dbname);
 
 		File dbfile = this.cordova.getActivity().getDatabasePath(dbname + ".db");
